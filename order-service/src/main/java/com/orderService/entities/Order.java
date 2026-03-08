@@ -19,11 +19,13 @@ public class Order {
     private EnumOrderStatus orderStatus;
     private Double totalValue;
     private LocalDateTime dateOrder;
+    @Column(nullable = false, unique = true)
+    private String idempotencyKey;
 
     public Order() {
     }
 
-    public Order(Long usrId, Long eventId, Integer ticketQuantity, Double ticketPrice) {
+    public Order(Long usrId, Long eventId, Integer ticketQuantity, Double ticketPrice, String idempotencyKey) {
         this.usrId = usrId;
         this.eventId = eventId;
         this.ticketQuantity = ticketQuantity;
@@ -31,6 +33,15 @@ public class Order {
         this.orderStatus = EnumOrderStatus.PENDING_PAYMENT;
         this.totalValue = calcTotalValue();
         this.dateOrder = LocalDateTime.now();
+        this.idempotencyKey = idempotencyKey;
+    }
+
+    public String getIdempotencyKey() {
+        return idempotencyKey;
+    }
+
+    public void setIdempotencyKey(String idempotencyKey) {
+        this.idempotencyKey = idempotencyKey;
     }
 
     public Long getId() {

@@ -6,6 +6,7 @@ import com.orderService.event.OrderCreatedEvent;
 import com.orderService.event.OrderEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import com.orderService.repository.OrderRepository;
 
@@ -33,26 +34,27 @@ public class OrderController {
     }
 
     @PostMapping("/order/create")
+    @Transactional
     public ResponseEntity<?> createOrder(@RequestBody Order order){
-        try{
-            Order savedOrder = orderRepository.save(order);
+        String idempotencyKey = order.getIdempotencyKey();
 
-            OrderCreatedEvent event = new OrderCreatedEvent(
-                    savedOrder.getId(),
-                    savedOrder.getUsrId(),
-                    savedOrder.getEventId(),
-                    savedOrder.getTicketQuantity(),
-                    savedOrder.getTicketPrice(),
-                    savedOrder.getTotalValue()
-            );
-
-            orderEventPublisher.publishOrderCreated(event);
-
-            return ResponseEntity.ok("");
-        } catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("");
+        if (orderRepository.findByIdempotencyKey(idempotencyKey) != null){
+            return ResponseEntity.ok(order);
         }
+
+        Order savedOrder = orderRepository.save(order);
+
+        OrderCreatedEvent event = new OrderCreatedEvent(
+                savedOrder.getId(),
+                savedOrder.getUsrId(),
+                savedOrder.getEventId(),
+                savedOrder.getTicketQuantity(),
+                savedOrder.getTicketPrice(),
+                savedOrder.getTotalValue()
+        );
+
+        orderEventPublisher.publishOrderCreated(event);
+        return ResponseEntity.ok("");
     }
 
     @PatchMapping("/order/cancel/{id}")

@@ -16,4 +16,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Modifying
     @Query("UPDATE Order SET orderStatus = :status WHERE id = :id")
     void changeStatus(@Param("id") Long id, @Param("status") EnumOrderStatus orderStatus);
+
+    Order findByIdempotencyKey(String key);
 }
