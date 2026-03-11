@@ -1,69 +1,51 @@
 package com.orderService.controller;
 
 import com.orderService.entities.Order;
-import com.orderService.enums.EnumOrderStatus;
-import com.orderService.event.OrderCreatedEvent;
-import com.orderService.event.OrderEventPublisher;
+import com.orderService.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import com.orderService.repository.OrderRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/order")
 public class OrderController {
 
     @Autowired
-    OrderRepository orderRepository;
-    @Autowired
-    OrderEventPublisher orderEventPublisher;
+    OrderService orderService;
 
     @GetMapping("/allOrders")
     public List<Order> getAllOrder(){
-        return orderRepository.findAll();
+        return orderService.getAllOrder();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable("id") Long id){
-        return orderRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/order/create")
-    @Transactional
-    public ResponseEntity<?> createOrder(@RequestBody Order order){
-        String idempotencyKey = order.getIdempotencyKey();
-
-        if (orderRepository.findByIdempotencyKey(idempotencyKey) != null){
+    public ResponseEntity<Optional<Order>> getOrderById(@PathVariable("id") Long id){
+        Optional<Order> order = orderService.getOrderById(id);
+        if (order.isPresent()){
             return ResponseEntity.ok(order);
+        } else {
+            return ResponseEntity.notFound().build();
         }
-
-        Order savedOrder = orderRepository.save(order);
-
-        OrderCreatedEvent event = new OrderCreatedEvent(
-                savedOrder.getId(),
-                savedOrder.getUsrId(),
-                savedOrder.getEventId(),
-                savedOrder.getTicketQuantity(),
-                savedOrder.getTicketPrice(),
-                savedOrder.getTotalValue()
-        );
-
-        orderEventPublisher.publishOrderCreated(event);
-        return ResponseEntity.ok("");
     }
 
-    @PatchMapping("/order/cancel/{id}")
+    @PostMapping("/create")
+    public ResponseEntity<Order> createOrder(@RequestBody Order order){
+        Order createdOrder = orderService.createOrder(order);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
+    }
+
+    @PatchMapping("/cancel/{id}")
     public ResponseEntity<?> cancelOrder(@PathVariable Long id){
-        try{
-            orderRepository.changeStatus(id, EnumOrderStatus.CANCELLED);
-            return ResponseEntity.ok("");
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body("");
+        Optional<Order> canceledOrder = orderService.cancelOrder(id);
+
+        if (canceledOrder.isPresent()){
+            return ResponseEntity.status(HttpStatus.OK).body(canceledOrder.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order não encontrada");
         }
     }
 }
