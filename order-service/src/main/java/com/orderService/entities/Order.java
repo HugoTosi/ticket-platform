@@ -1,5 +1,6 @@
 package com.orderService.entities;
 
+import com.orderService.dto.OrderRequestDto;
 import com.orderService.enums.EnumOrderStatus;
 import jakarta.persistence.*;
 
@@ -19,6 +20,7 @@ public class Order {
     private EnumOrderStatus orderStatus;
     private Double totalValue;
     private LocalDateTime dateOrder;
+    private LocalDateTime updateAt;
     @Column(nullable = false, unique = true)
     private String idempotencyKey;
 
@@ -33,7 +35,18 @@ public class Order {
         this.orderStatus = EnumOrderStatus.PENDING_PAYMENT;
         this.totalValue = calcTotalValue();
         this.dateOrder = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
         this.idempotencyKey = idempotencyKey;
+    }
+
+    public static Order orderRequestToOrder(OrderRequestDto orderRequestDto){
+        return new Order(
+                orderRequestDto.getUsrId(),
+                orderRequestDto.getEventId(),
+                orderRequestDto.getTicketQuantity(),
+                orderRequestDto.getTicketPrice(),
+                orderRequestDto.getIdempotencyKey()
+        );
     }
 
     public String getIdempotencyKey() {
@@ -88,7 +101,6 @@ public class Order {
         return totalValue;
     }
 
-
     public LocalDateTime getDateOrder() {
         return dateOrder;
     }
@@ -107,5 +119,13 @@ public class Order {
 
     public void setTicketPrice(Double ticketPrice) {
         this.ticketPrice = ticketPrice;
+    }
+
+    public LocalDateTime getUpdateAt() {
+        return updateAt;
+    }
+
+    public void setUpdateAt(LocalDateTime updateAt) {
+        this.updateAt = updateAt;
     }
 }

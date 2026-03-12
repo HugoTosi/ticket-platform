@@ -1,7 +1,9 @@
 package com.orderService.controller;
 
-import com.orderService.entities.Order;
+import com.orderService.dto.OrderRequestDto;
+import com.orderService.dto.OrderResponseDto;
 import com.orderService.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +20,13 @@ public class OrderController {
     OrderService orderService;
 
     @GetMapping("/allOrders")
-    public List<Order> getAllOrder(){
+    public List<OrderResponseDto> getAllOrder(){
         return orderService.getAllOrder();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Order>> getOrderById(@PathVariable("id") Long id){
-        Optional<Order> order = orderService.getOrderById(id);
+    public ResponseEntity<Optional<OrderResponseDto>> getOrderById(@PathVariable("id") Long id){
+        Optional<OrderResponseDto> order = orderService.getOrderById(id);
         if (order.isPresent()){
             return ResponseEntity.ok(order);
         } else {
@@ -33,14 +35,14 @@ public class OrderController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Order> createOrder(@RequestBody Order order){
-        Order createdOrder = orderService.createOrder(order);
+    public ResponseEntity<OrderResponseDto> createOrder(@Valid @RequestBody OrderRequestDto order){
+        OrderResponseDto createdOrder = orderService.createOrder(order);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
 
     @PatchMapping("/cancel/{id}")
     public ResponseEntity<?> cancelOrder(@PathVariable Long id){
-        Optional<Order> canceledOrder = orderService.cancelOrder(id);
+        Optional<OrderResponseDto> canceledOrder = orderService.cancelOrder(id);
 
         if (canceledOrder.isPresent()){
             return ResponseEntity.status(HttpStatus.OK).body(canceledOrder.get());

@@ -1,5 +1,7 @@
 package com.orderService.service;
 
+import com.orderService.dto.OrderRequestDto;
+import com.orderService.dto.OrderResponseDto;
 import com.orderService.entities.Order;
 import com.orderService.enums.EnumOrderStatus;
 import com.orderService.event.OrderCreatedEvent;
@@ -9,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,21 +23,34 @@ public class OrderService {
     @Autowired
     OrderEventPublisher orderEventPublisher;
 
-    public List<Order> getAllOrder(){
-        return orderRepository.findAll();
+    public List<OrderResponseDto> getAllOrder(){
+        List<Order> orders = orderRepository.findAll();
+        List<OrderResponseDto> listResponse = new ArrayList<>();
+
+        for(Order order : orders){
+            listResponse.add(OrderResponseDto.orderToOrderResponse(order));
+        }
+        return listResponse;
     }
 
-    public Optional<Order> getOrderById(Long id){
-        return orderRepository.findById(id);
+    public Optional<OrderResponseDto> getOrderById(Long id){
+        Optional<Order> order = orderRepository.findById(id);
+        if (order.isPresent()){
+            return Optional.of(OrderResponseDto.orderToOrderResponse(order.get()));
+        }
+        return Optional.empty();
     }
 
     @Transactional
-    public Order createOrder(Order order){
+    public OrderResponseDto createOrder(OrderRequestDto orderRequestDto){
+
+        Order order = Order.orderRequestToOrder(orderRequestDto);
+
         String idempotencyKey = order.getIdempotencyKey();
         Order existingOrder = orderRepository.findByIdempotencyKey(idempotencyKey);
 
         if (existingOrder != null){
-            return existingOrder;
+            return OrderResponseDto.orderToOrderResponse(existingOrder);
         }
 
         Order savedOrder = orderRepository.save(order);
@@ -48,16 +65,17 @@ public class OrderService {
         );
 
         orderEventPublisher.publishOrderCreated(event);
-        return savedOrder;
+        return OrderResponseDto.orderToOrderResponse(savedOrder);
     }
 
     @Transactional
-    public Optional<Order> cancelOrder(Long id){
+    public Optional<OrderResponseDto> cancelOrder(Long id){
         Optional<Order> order = orderRepository.findById(id);
         if (order.isPresent()){
             order.get().setOrderStatus(EnumOrderStatus.CANCELLED);
+            order.get().setUpdateAt(LocalDateTime.now());
             orderRepository.save(order.get());
-            return order;
+            return Optional.of(OrderResponseDto.orderToOrderResponse(order.get()));
         }
         return Optional.empty();
     }
