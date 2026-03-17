@@ -1,5 +1,7 @@
 package com.paymentService.dto;
 
+import com.paymentService.enums.EnumPaymentMethod;
+
 public class OrderCreated {
     private Long orderId;
     private Long userId;
@@ -7,6 +9,7 @@ public class OrderCreated {
     private Integer ticketQuantity;
     private Double ticketPrice;
     private Double totalValue;
+    private EnumPaymentMethod paymentMethod;
 
     public OrderCreated() {
     }
@@ -20,7 +23,16 @@ public class OrderCreated {
                 ", ticketQuantity=" + ticketQuantity +
                 ", ticketPrice=" + ticketPrice +
                 ", totalValue=" + totalValue +
+                ", paymentMethod=" + paymentMethod +
                 '}';
+    }
+
+    public EnumPaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(EnumPaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
     public Long getOrderId() {

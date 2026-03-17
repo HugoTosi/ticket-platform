@@ -1,5 +1,6 @@
 package com.paymentService.entities;
 
+import com.paymentService.dto.OrderCreated;
 import com.paymentService.enums.EnumPaymentMethod;
 import com.paymentService.enums.EnumPaymentStatus;
 import jakarta.persistence.*;
@@ -19,8 +20,29 @@ public class Payment {
     private EnumPaymentStatus paymentStatus;
     @Enumerated(EnumType.STRING)
     private EnumPaymentMethod paymentMethod;
+    private Double totalValue;
 
     public Payment() {
+    }
+
+    public Payment(Long orderId, Double totalValue, EnumPaymentMethod paymentMethod) {
+        this.orderId = orderId;
+        this.createdAt = LocalDateTime.now();
+        this.totalValue = totalValue;
+        this.paymentMethod = paymentMethod;
+        this.paymentStatus = EnumPaymentStatus.PROCESSING;
+    }
+
+    public Payment OrderCreatedToPayment(OrderCreated orderCreated){
+        return new Payment();
+    }
+
+    public Double getTotalValue() {
+        return totalValue;
+    }
+
+    public void setTotalValue(Double totalValue) {
+        this.totalValue = totalValue;
     }
 
     public Long getId() {
