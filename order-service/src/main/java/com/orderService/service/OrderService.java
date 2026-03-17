@@ -61,7 +61,8 @@ public class OrderService {
                 savedOrder.getEventId(),
                 savedOrder.getTicketQuantity(),
                 savedOrder.getTicketPrice(),
-                savedOrder.getTotalValue()
+                savedOrder.getTotalValue(),
+                savedOrder.getPaymentMethod()
         );
 
         orderEventPublisher.publishOrderCreated(event);

@@ -1,5 +1,6 @@
 package com.orderService.dto;
 
+import com.orderService.enums.EnumPaymentMethod;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -14,6 +15,16 @@ public class OrderRequestDto {
     private Double ticketPrice;
     @NotBlank(message = "idempotencyKey não deve ser vazio")
     private String idempotencyKey;
+    @NotNull(message = "paymentMethod não deve ser vazio")
+    private EnumPaymentMethod paymentMethod;
+
+    public EnumPaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(EnumPaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
 
     public Long getUsrId() {
         return usrId;

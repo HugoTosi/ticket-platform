@@ -1,5 +1,7 @@
 package com.orderService.event;
 
+import com.orderService.enums.EnumPaymentMethod;
+
 public class OrderCreatedEvent {
     private Long orderId;
     private Long userId;
@@ -7,17 +9,27 @@ public class OrderCreatedEvent {
     private Integer ticketQuantity;
     private Double ticketPrice;
     private Double totalValue;
+    private EnumPaymentMethod paymentMethod;
 
     public OrderCreatedEvent() {
     }
 
-    public OrderCreatedEvent(Long orderId, Long userId, Long eventId, Integer ticketQuantity, Double ticketPrice, Double totalValue) {
+    public OrderCreatedEvent(Long orderId, Long userId, Long eventId, Integer ticketQuantity, Double ticketPrice, Double totalValue, EnumPaymentMethod paymentMethod) {
         this.orderId = orderId;
         this.userId = userId;
         this.eventId = eventId;
         this.ticketQuantity = ticketQuantity;
         this.ticketPrice = ticketPrice;
         this.totalValue = totalValue;
+        this.paymentMethod = paymentMethod;
+    }
+
+    public EnumPaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(EnumPaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
     public Long getOrderId() {

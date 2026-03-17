@@ -2,6 +2,7 @@ package com.orderService.entities;
 
 import com.orderService.dto.OrderRequestDto;
 import com.orderService.enums.EnumOrderStatus;
+import com.orderService.enums.EnumPaymentMethod;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,8 @@ public class Order {
     private Double ticketPrice;
     @Enumerated(EnumType.STRING)
     private EnumOrderStatus orderStatus;
+    @Enumerated
+    private EnumPaymentMethod paymentMethod;
     private Double totalValue;
     private LocalDateTime dateOrder;
     private LocalDateTime updateAt;
@@ -27,7 +30,7 @@ public class Order {
     public Order() {
     }
 
-    public Order(Long usrId, Long eventId, Integer ticketQuantity, Double ticketPrice, String idempotencyKey) {
+    public Order(Long usrId, Long eventId, Integer ticketQuantity, Double ticketPrice, String idempotencyKey, EnumPaymentMethod paymentMethod) {
         this.usrId = usrId;
         this.eventId = eventId;
         this.ticketQuantity = ticketQuantity;
@@ -37,6 +40,7 @@ public class Order {
         this.dateOrder = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
         this.idempotencyKey = idempotencyKey;
+        this.paymentMethod = paymentMethod;
     }
 
     public static Order orderRequestToOrder(OrderRequestDto orderRequestDto){
@@ -45,8 +49,17 @@ public class Order {
                 orderRequestDto.getEventId(),
                 orderRequestDto.getTicketQuantity(),
                 orderRequestDto.getTicketPrice(),
-                orderRequestDto.getIdempotencyKey()
+                orderRequestDto.getIdempotencyKey(),
+                orderRequestDto.getPaymentMethod()
         );
+    }
+
+    public EnumPaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(EnumPaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
     public String getIdempotencyKey() {
