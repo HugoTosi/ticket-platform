@@ -1,12 +1,12 @@
 package com.paymentService.service;
 
-import com.paymentService.dto.OrderCreated;
 import com.paymentService.entities.Payment;
-import com.paymentService.enums.EnumPaymentStatus;
-import com.paymentService.event.PaymentProcessedEvent;
 import com.paymentService.event.PaymentProcessedPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ticket_contracts.enums.EnumPaymentStatus;
+import ticket_contracts.events.OrderCreatedEvent;
+import ticket_contracts.events.PaymentProcessedEvent;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +15,7 @@ public class PaymentService {
     @Autowired
     PaymentProcessedPublisher paymentProcessedPublisher;
 
-    public void processPayment(OrderCreated orderCreated){
+    public void processPayment(OrderCreatedEvent orderCreated){
         //Simulacao para evento assincrono para processamento de pagamento
         //int randomChanceOfApproval = new Random().nextInt(10);
         int randomChanceOfApproval = 9; //Teste
@@ -37,7 +37,7 @@ public class PaymentService {
         }
     }
 
-    public Payment orderCreatedToPayment(OrderCreated orderCreated){
+    public Payment orderCreatedToPayment(OrderCreatedEvent orderCreated){
         return new Payment(orderCreated.getOrderId(), orderCreated.getTotalValue(), orderCreated.getPaymentMethod());
     }
 }

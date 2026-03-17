@@ -4,12 +4,12 @@ import com.orderService.dto.OrderRequestDto;
 import com.orderService.dto.OrderResponseDto;
 import com.orderService.entities.Order;
 import com.orderService.enums.EnumOrderStatus;
-import com.orderService.event.OrderCreatedEvent;
 import com.orderService.event.OrderEventPublisher;
 import com.orderService.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ticket_contracts.events.OrderCreatedEvent;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

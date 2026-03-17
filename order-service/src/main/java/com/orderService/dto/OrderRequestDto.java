@@ -1,8 +1,8 @@
 package com.orderService.dto;
 
-import com.orderService.enums.EnumPaymentMethod;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import ticket_contracts.enums.EnumPaymentMethod;
 
 public class OrderRequestDto {
     @NotNull(message = "usrId não deve ser vazio")

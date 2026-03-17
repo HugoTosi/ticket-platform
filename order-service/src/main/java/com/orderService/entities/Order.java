@@ -2,8 +2,8 @@ package com.orderService.entities;
 
 import com.orderService.dto.OrderRequestDto;
 import com.orderService.enums.EnumOrderStatus;
-import com.orderService.enums.EnumPaymentMethod;
 import jakarta.persistence.*;
+import ticket_contracts.enums.EnumPaymentMethod;
 
 import java.time.LocalDateTime;
 

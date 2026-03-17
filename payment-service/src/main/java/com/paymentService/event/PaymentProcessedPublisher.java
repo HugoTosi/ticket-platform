@@ -2,6 +2,7 @@ package com.paymentService.event;
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import ticket_contracts.events.PaymentProcessedEvent;
 
 @Service
 public class PaymentProcessedPublisher {

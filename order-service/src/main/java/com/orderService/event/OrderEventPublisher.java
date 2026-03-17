@@ -2,6 +2,7 @@ package com.orderService.event;
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import ticket_contracts.events.OrderCreatedEvent;
 
 @Service
 public class OrderEventPublisher {

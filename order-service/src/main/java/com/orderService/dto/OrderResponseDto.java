@@ -2,7 +2,7 @@ package com.orderService.dto;
 
 import com.orderService.entities.Order;
 import com.orderService.enums.EnumOrderStatus;
-import com.orderService.enums.EnumPaymentMethod;
+import ticket_contracts.enums.EnumPaymentMethod;
 
 public class OrderResponseDto {
     private final Long id;

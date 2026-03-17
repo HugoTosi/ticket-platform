@@ -1,9 +1,9 @@
 package com.paymentService.entities;
 
-import com.paymentService.dto.OrderCreated;
-import com.paymentService.enums.EnumPaymentMethod;
-import com.paymentService.enums.EnumPaymentStatus;
 import jakarta.persistence.*;
+import ticket_contracts.enums.EnumPaymentMethod;
+import ticket_contracts.enums.EnumPaymentStatus;
+import ticket_contracts.events.OrderCreatedEvent;
 
 import java.time.LocalDateTime;
 
@@ -33,7 +33,7 @@ public class Payment {
         this.paymentStatus = EnumPaymentStatus.PROCESSING;
     }
 
-    public Payment OrderCreatedToPayment(OrderCreated orderCreated){
+    public Payment OrderCreatedToPayment(OrderCreatedEvent orderCreated){
         return new Payment();
     }
 
