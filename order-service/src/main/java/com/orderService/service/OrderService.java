@@ -6,6 +6,7 @@ import com.orderService.entities.Order;
 import com.orderService.enums.EnumOrderStatus;
 import com.orderService.event.OrderEventPublisher;
 import com.orderService.repository.OrderRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class OrderService {
     @Autowired
@@ -50,10 +52,12 @@ public class OrderService {
         Order existingOrder = orderRepository.findByIdempotencyKey(idempotencyKey);
 
         if (existingOrder != null){
+            log.info("Order já cadastrada: Id={}, idempotencyKey={}", existingOrder.getId(), existingOrder.getIdempotencyKey());
             return OrderResponseDto.orderToOrderResponse(existingOrder);
         }
 
         Order savedOrder = orderRepository.save(order);
+        log.info("Order criada: Id={}", savedOrder.getId());
 
         OrderCreatedEvent event = new OrderCreatedEvent(
                 savedOrder.getId(),
@@ -76,8 +80,10 @@ public class OrderService {
             order.get().setOrderStatus(EnumOrderStatus.CANCELLED);
             order.get().setUpdateAt(LocalDateTime.now());
             orderRepository.save(order.get());
+            log.info("Order cancelada: id={}", order.get().getId());
             return Optional.of(OrderResponseDto.orderToOrderResponse(order.get()));
         }
+        log.warn("Order não encontrada para cancelar: id={}", id);
         return Optional.empty();
     }
 }

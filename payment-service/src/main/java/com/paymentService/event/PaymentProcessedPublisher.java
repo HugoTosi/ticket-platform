@@ -1,9 +1,11 @@
 package com.paymentService.event;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ticket_contracts.events.PaymentProcessedEvent;
 
+@Slf4j
 @Service
 public class PaymentProcessedPublisher {
 
@@ -14,7 +16,8 @@ public class PaymentProcessedPublisher {
     }
 
     public void publishPaymentProcessed(PaymentProcessedEvent paymentProcessedEvent){
-        paymentProcessedEvent.setPaymentId(01L);
+        paymentProcessedEvent.setPaymentId(01L); //Teste
         kafkaTemplate.send("payment-processed-topic", paymentProcessedEvent);
+        log.info("Enviando evento kafka (paymentProcessed): paymentId={}", paymentProcessedEvent.getPaymentId());
     }
 }
