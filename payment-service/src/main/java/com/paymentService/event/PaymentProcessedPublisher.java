@@ -16,7 +16,6 @@ public class PaymentProcessedPublisher {
     }
 
     public void publishPaymentProcessed(PaymentProcessedEvent paymentProcessedEvent){
-        paymentProcessedEvent.setPaymentId(01L); //Teste
         kafkaTemplate.send("payment-processed-topic", paymentProcessedEvent);
         log.info("Enviando evento kafka (paymentProcessed): paymentId={}", paymentProcessedEvent.getPaymentId());
     }
