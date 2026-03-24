@@ -6,7 +6,6 @@ import com.paymentService.exception.PaymentProcessingException;
 import com.paymentService.repository.PaymentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.resilience.annotation.EnableResilientMethods;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;

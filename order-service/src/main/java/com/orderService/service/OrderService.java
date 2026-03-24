@@ -5,12 +5,17 @@ import com.orderService.dto.OrderResponseDto;
 import com.orderService.entities.Order;
 import com.orderService.enums.EnumOrderStatus;
 import com.orderService.event.OrderEventPublisher;
+import com.orderService.event.PaymentProcessedConsumer;
+import com.orderService.exception.InvalidPaymentStatusException;
+import com.orderService.exception.OrderNotFoundException;
 import com.orderService.repository.OrderRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ticket_contracts.enums.EnumPaymentStatus;
 import ticket_contracts.events.OrderCreatedEvent;
+import ticket_contracts.events.PaymentProcessedEvent;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -85,5 +90,28 @@ public class OrderService {
         }
         log.warn("Order não encontrada para cancelar: id={}", id);
         return Optional.empty();
+    }
+
+    public void processPaymentResult(PaymentProcessedEvent paymentProcessedEvent){
+        Optional<Order> order = orderRepository.findById(paymentProcessedEvent.getOrderId());
+        if (order.isPresent()){
+            order.get().setOrderStatus(mapPaymentStatusToOrderStatus(paymentProcessedEvent.getPaymentStatus()));
+            order.get().setUpdateAt(LocalDateTime.now());
+            orderRepository.save(order.get());
+            log.info("Order status atualizado: orderId={}, orderStatus={}", order.get().getId(), order.get().getOrderStatus());
+        } else {
+            log.error("Order nao encontrada para alterar status com base no paymentProcessedEvent: orderId{}",
+                    paymentProcessedEvent.getOrderId());
+            throw new OrderNotFoundException("Order nao encontrada: orderId:" + paymentProcessedEvent.getOrderId());
+        }
+    }
+
+    public EnumOrderStatus mapPaymentStatusToOrderStatus(EnumPaymentStatus paymentStatus){
+        return switch (paymentStatus){
+            case PENDING, PROCESSING -> throw new InvalidPaymentStatusException("Status invalido para atualizar order" + paymentStatus);
+            case APPROVED -> EnumOrderStatus.PAID;
+            case DECLINED -> EnumOrderStatus.DECLINED;
+            case FAILED -> EnumOrderStatus.FAILED;
+        };
     }
 }
